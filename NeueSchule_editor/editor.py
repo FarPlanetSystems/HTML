@@ -1,6 +1,7 @@
 import tkinter as tk
 import abc
 from tkinter import ttk
+from datetime import date
 
 #ViewModel
 class Article:
@@ -12,12 +13,11 @@ class Article:
         self.isUploaded = False
         self.ArticleOpened_event = self.__default_articleOpened
     
-    def __default_articleOpened(self):
-        print("Hello world")
+    def __default_articleOpened(self, obj):
         pass
 
     def OpenArticle(self):
-        self.ArticleOpened_event()
+        self.ArticleOpened_event(self)
     def __str__(self):
         return "article"
 
@@ -28,16 +28,25 @@ class Library:
         self.__uploadEvent = uploadEvent
         self.__deleteEvent = deleteEvent
         self.__updateEvent = updateEvent
+        self.__currentArticle = None
+        self.NotifyCurrentArticleChanged = self.__default_CurrentArticleChanged
+        self.NotifyArticleAdded = self.__default_CurrentArticleChanged
+        self.NotifyArticleRemoved = self.__default_CurrentArticleChanged
 
-    def getArticleByIndex(self, index):
-        try:
-            res = self.__articles[index]
-        except:
-            res = self.__articles[0]
-        return res
+    def __default_CurrentArticleChanged(self, obj:Article):
+        pass
+    def GetCurrentArticle(self):
+        return self.__currentArticle
+    def SetCurrentArticle(self, value:Article):
+        self.__currentArticle = value
+        self.NotifyCurrentArticleChanged(value)
 
-    def getNumOfArticles(self):
-        return len(self.__articles)
+    def SaveArticleCommand(self, title, text, photo):
+        datestr = str(date.today())
+        article = Article(title, text, "no", datestr)
+        self.addArticle(article)
+        pass
+    #self.__articleTextEntry.get(1.0, "end")
     
     def addArticle(self, article):
         if article.__str__() == "article":
@@ -49,24 +58,37 @@ class Library:
                 self.__updateEvent(updatedArticle.title)
             else:
                 self.__articles.append(article)
+                article.ArticleOpened_event = self.SetCurrentArticle
                 self.__saveEvent(article.title)
+            self.NotifyArticleAdded(article)
 
-    def removeArticle(self, article):
-        if article.__str__() == "article":
-            self.__articles.remove(article)
-            self.__deleteEvent(article.Titel)
+    def removeArticleCommand(self):
+        self.__articles.remove(self.__currentArticle)
+        self.SetCurrentArticle(self.__articles[0])
+        self.NotifyArticleRemoved(self.__currentArticle)
+        self.__deleteEvent(self.__currentArticle.title)
 
-    def uploadArticle(self, article):
-        if article.__str__() == "article":
-            if self.__compareNames(article):
-                self.__uploadEvent(article.titel)
+    def uploadArticleCommand(self):
+        self.__currentArticle.isUploaded = not(self.__currentArticle.isUploaded)
+        self.SetCurrentArticle(self.__currentArticle)
+        self.__uploadEvent(self.__currentArticle.title)
+    
+    
 
+    def getNumOfArticles(self):
+        return len(self.__articles)
 
     def __findArticleByTitle(self, Title:str):
         for i in self.__articles:
             if i.title == Title:
                 return i
         return None
+    def getArticleByIndex(self, index):
+        try:
+            res = self.__articles[index]
+        except:
+            res = self.__articles[0]
+        return res
     def __compareNames(self, article):
         if self.__findArticleByTitle(article.title) != None:
             return True
@@ -135,6 +157,10 @@ class MainWindow(Window):
         self.IsArticleUploaded = tk.BooleanVar()
         self.IsArticleUploaded.set(False)
 
+        dataContext.NotifyCurrentArticleChanged = self.__onArticleOpened
+
+        self.__articleTextEntry = tk.Text(master=self._visualizer, font="Calibri 20")
+
 
     def SetDefaultVisualization(self):
         self._visualizer.title('NeueSchule editor')
@@ -166,13 +192,13 @@ class MainWindow(Window):
 
         ArticleTitleEntry = ttk.Entry(master=self._visualizer, font="Calibri 20", textvariable=self.ArticleTitle)
         ArticleTitleEntry.grid(row=1, column=1, columnspan=2, sticky='nsew', padx=10, pady=10)
-        self.__articleTextEntry = tk.Text(master=self._visualizer, font="Calibri 20")
+
         self.__articleTextEntry.grid(row=2, column=1, columnspan=2, sticky='nsew', padx=10, pady=10)
         
         ButtonFrame = ttk.Frame(master=self._visualizer)
         SaveButton = ttk.Button(master=ButtonFrame, text="Save", command=self.__clickSaveButton)
-        UploadButton = ttk.Button(master=ButtonFrame, text="Upload")
-        DeleteButton = ttk.Button(master=ButtonFrame, text="Delete")
+        UploadButton = ttk.Button(master=ButtonFrame, text="Upload", command=self.__clickUploadButton)
+        DeleteButton = ttk.Button(master=ButtonFrame, text="Delete", command=self.__clickDeleteButton)
 
         ButtonFrame.rowconfigure(0, weight=1)
         ButtonFrame.columnconfigure((0, 1, 2), weight=1)
@@ -185,10 +211,28 @@ class MainWindow(Window):
         self._isVisualized = True
 
     def __clickSaveButton(self):
-        article = Article(self.ArticleTitle.get(), self.__articleTextEntry.get(1.0, "end"), "no", "25.06.2024")
-        self.dataContext.addArticle(article)
+
+        self.dataContext.SaveArticleCommand(self.ArticleTitle.get(), self.__articleTextEntry.get(1.0, "end"), "no")
         ArticlesList(self._visualizer, self.dataContext)
-        print(self.__articleTextEntry.get(1.0, "end"))
+    
+    def __clickDeleteButton(self):
+        self.dataContext.removeArticleCommand()
+        ArticlesList(self._visualizer, self.dataContext)
+        pass
+
+    def __clickUploadButton(self):
+        self.dataContext.uploadArticleCommand()
+        ArticlesList(self._visualizer, self.dataContext)
+        pass
+    
+    def __onArticleOpened(self, article:Article):
+        self.__articleTextEntry.delete(1.0, "end")
+        self.__articleTextEntry.insert(1.0, article.text)
+        self.ArticleTitle.set(article.title)
+        self.ArtcleDate.set(article.date)
+        self.IsArticleUploaded.set(article.isUploaded)
+
+
 
     def Show(self):
         self._defaultShow()
