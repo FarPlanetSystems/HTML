@@ -1,1 +1,4 @@
 /node_modules
+/backend/database_config.js
+/backend/tester.js
+/backend/tester.html
