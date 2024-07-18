@@ -26,14 +26,15 @@ class Window(abc.ABC):
         self._visualizer.mainloop()
 
 class MainWindow(Window):
-    def __init__(self, dataContext):
+    def __init__(self, dataContext, app):
         super().__init__(dataContext)
         self.ArticleTitle = tk.StringVar()
         self.ArtcleDate = tk.StringVar()
         self.IsArticleUploaded = tk.BooleanVar()
         self.ArticleImagePath = tk.StringVar()
-        self.IsArticleUploaded.set(False)
         self.isImageShown = False
+        self.MessageLine = tk.StringVar()
+        app.NotifyOnNewMessage =  self.MessageLine.set
 
         dataContext.NotifyCurrentArticleChanged = self.__onArticleOpened
 
@@ -47,11 +48,12 @@ class MainWindow(Window):
         
         self._visualizer.columnconfigure((0,1,2), weight = 1, uniform="a")
 
-        self._visualizer.rowconfigure(0, weight = 2, uniform="a")
-        self._visualizer.rowconfigure(1, weight = 1, uniform="a")
-        self._visualizer.rowconfigure(2, weight=2, uniform="a")
-        self._visualizer.rowconfigure(3, weight = 10, uniform="a")
-        self._visualizer.rowconfigure(4, weight = 4, uniform="a")
+        self._visualizer.rowconfigure(0, weight = 4, uniform="a")
+        self._visualizer.rowconfigure(1, weight = 2, uniform="a")
+        self._visualizer.rowconfigure(2, weight=4, uniform="a")
+        self._visualizer.rowconfigure(3, weight = 20, uniform="a")
+        self._visualizer.rowconfigure(4, weight = 8, uniform="a")
+        self._visualizer.rowconfigure(5, weight=2, uniform="a")
 
         # row 0 column 1
         headerFrame = ttk.Frame(master=self._visualizer)
@@ -107,24 +109,30 @@ class MainWindow(Window):
         SaveButton.grid(column=0, row=0, sticky="nsew", padx=35, pady=35)
         UploadButton.grid(column=1, row=0, sticky="nsew", padx=35, pady=35)
         DeleteButton.grid(column=2, row=0, sticky="nsew", padx=35, pady=35)
-        ButtonFrame.grid(row=4, column=1, columnspan=2, sticky='nsew', padx=10, pady=10)
+        ButtonFrame.grid(row=4, column=1, columnspan=2, sticky='nsew', padx=10)
+
+        # row 5 colomnum 0-1
+
+        MessageLabel = ttk.Label(master=self._visualizer, textvariable=self.MessageLine, font="Calibri 16")
+
+        MessageLabel.grid(row=5, column=0, columnspan=2, sticky="sew", padx=10)
 
         # column 0
-        list = ArticlesList(self._visualizer, self.dataContext, self.__clear)
+        list = ArticlesList(self._visualizer, self.dataContext, self.__createEmptyArticle)
         self._isVisualized = True
 
     def __clickSaveButton(self):
 
         self.dataContext.SaveArticleCommand(self.ArticleTitle.get(), self.__articleTextEntry.get(1.0, "end"), self.ArticleImagePath.get())
-        ArticlesList(self._visualizer, self.dataContext, self.__clear)
+        ArticlesList(self._visualizer, self.dataContext, self.__createEmptyArticle)
     
     def __clickDeleteButton(self):
         self.dataContext.removeArticleCommand()
-        ArticlesList(self._visualizer, self.dataContext, self.__clear)
+        ArticlesList(self._visualizer, self.dataContext, self.__createEmptyArticle)
 
     def __clickUploadButton(self):
-        self.dataContext.uploadArticleCommand()
-        ArticlesList(self._visualizer, self.dataContext, self.__clear)
+        self.dataContext.uploadArticleCommand(self.ArticleTitle.get(), self.__articleTextEntry.get(1.0, "end"), self.ArticleImagePath.get())
+        ArticlesList(self._visualizer, self.dataContext, self.__createEmptyArticle)
 
     def __clickCheckImageButton(self):
         if not(self.isImageShown):
@@ -168,12 +176,18 @@ class MainWindow(Window):
         self.path = self.dataContext.currentArticle.image
 
     def __clear(self):
-        self.ArticleTitle.set("")
+        self.ArticleTitle.set("draft")
         self.__articleTextEntry.delete(1.0, "end")
         self.ArtcleDate.set(str(date.today()))
         self.IsArticleUploaded.set(False)
         self.ArticleImagePath.set("no image")
         self.path = ""
+
+    def __createEmptyArticle(self):
+        self.__clear()
+        self.dataContext.createArticle(self.ArticleTitle.get(), self.__articleTextEntry.get(1.0, "end"), self.ArticleImagePath.get())
+        ArticlesList(self._visualizer, self.dataContext, self.__createEmptyArticle)
+        pass
 
     def Show(self):
         self._defaultShow()
