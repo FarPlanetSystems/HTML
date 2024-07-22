@@ -2,6 +2,8 @@ import tkinter as tk
 import requests
 from datetime import date, datetime
 from editor_view import MainWindow
+from PIL import Image
+import os
 
 
 #ViewModel
@@ -37,7 +39,7 @@ class Article:
         return json
 
 class Library:
-    def __init__(self, saveEvent, uploadEvent, deleteEvent, updateEvent):
+    def __init__(self, saveEvent, uploadEvent, deleteEvent, updateEvent, imageAttachedEvent):
         self.__articles = []
         self.__saveEvent = saveEvent
         self.__uploadEvent = uploadEvent
@@ -47,6 +49,7 @@ class Library:
         self.NotifyCurrentArticleChanged = self.__default_CurrentArticleChanged
         self.NotifyArticleAdded = self.__default_CurrentArticleChanged
         self.NotifyArticleRemoved = self.__default_CurrentArticleChanged
+        self.NotifyImageWasAttached = imageAttachedEvent
 
 
     def __default_CurrentArticleChanged(self):
@@ -113,7 +116,6 @@ class Library:
             self.currentArticle.date = newArticle.date
             self.currentArticle.time = newArticle.time
             self.currentArticle.isUploaded = newArticle.isUploaded
-            print(self.currentArticle.json())
             self.SetCurrentArticle(self.currentArticle)
     
     
@@ -130,16 +132,22 @@ class Library:
 
 
 #Model
+#this class is generally responsable for the work between ViewModel and our server
 class App:
     def __init__(self):
+        self.__setImagesFolder()
         self.NotifyOnNewMessage = self.__default_event
         self.AllWindows = []
         self.__loadLibrary()
         self.MainWindow = MainWindow(self.Library, self)
         self.AllWindows.append(MainWindow)
         if self.Library.getNumOfArticles() > 0:
-            print(self.Library.getArticleByIndex(0).isUploaded)
             self.Library.getArticleByIndex(0).OpenArticle()
+    
+    def __setImagesFolder(self):
+        supposedDirName = os.path.join(os.path.curdir, "neueSchule_editor", "images")
+        if not os.path.exists(supposedDirName):
+            os.mkdir(supposedDirName)
     
     def __default_event(self, obj):
         pass
@@ -210,14 +218,48 @@ class App:
             Text = "Success! "
             Text += api_response["message"] + success_msg
         return Text
+    
+    def __attachImage(self, oldPath, newPath):
 
+        #since on our website all images must have the size of 500x500
+        #we want our editors to be aware of the changes to come while
+        #working on articles. As the wished image is imported, we save it
+        #in specific folder "images", where their format will be changed,
+        #not damaging the original file
+
+        
+        res = newPath
+        dest = os.path.join(os.path.curdir, "neueSchule_editor","images")
+
+        #formating the image
+        image = Image.open(newPath)
+        image = image.resize((500, 500))
+
+        #if the edtor has already imported an image, we just removed the previous file
+        #of course we need to check, whether the previous path was saved properly, if
+        # we dont want to delete an external file 
+        print(oldPath)
+        if os.path.exists(oldPath):
+            os.remove(oldPath)
+
+        #saving the path of the new image
+        res = os.path.join(dest, os.path.basename(newPath))
+        #some articles may refer to one image with the same name, so we need to
+        #check this option and change the basename of the path in that case
+        i = 1
+        while os.path.exists(res):
+            i += 1
+            res = res+str(i)
+        res = os.path.abspath(res)
+        image.save(res)
+        return res
 
     def __loadLibrary(self):
         #Request to server
         api_load_url = "http://localhost:4321/api/articles"
         response = requests.get(api_load_url).json()
         #initializing the library
-        self.Library = Library(self.SaveArticle, self.UploadArticle, self.DeleteArticle, self.UpdateArticle)
+        self.Library = Library(self.SaveArticle, self.UploadArticle, self.DeleteArticle, self.UpdateArticle, self.__attachImage)
         for i in response:
             article = Article(i["title"], i["text"], i["imagePath"], i["date"], i["isUploaded"], i["articleTime"])
             article.id = i["id"]

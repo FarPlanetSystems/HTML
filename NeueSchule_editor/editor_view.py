@@ -160,7 +160,8 @@ class MainWindow(Window):
 
     
     def __clickImportButton(self):
-        self.path = filedialog.askopenfile().name
+        newPath = filedialog.askopenfile().name
+        self.path = self.dataContext.NotifyImageWasAttached(self.path, newPath)
         self.ArticleImagePath.set(self.path)
         if self.isImageShown == True:
             self.__clickCheckImageButton()

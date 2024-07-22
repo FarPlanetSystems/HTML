@@ -3,18 +3,17 @@ const {LoadAllArticles, FindLatestUploadedTitles, SaveArticle, DeleteArticle, Up
 const multer = require("multer");
 const bp = require("body-parser");
 const path = require("path")
+const fs = require("node:fs")
 
 var storage = multer.diskStorage({
     destination: function(req, file, cb) {
-      cb(null, "uploads"); // here we specify the destination . in this case i specified the current directory
+      cb(null, path.resolve("public", "uploads")); // here we specify the destination . in this case i specified the current directory
     },
     filename: function(req, file, cb) {
       console.log(file);
       cb(null, file.originalname);// here we specify the file saving name . in this case i specified the original file name
     }
   });
-
-
 
 const upload = multer({storage:storage})
 
@@ -23,26 +22,7 @@ server.use(express.static("./public"))
 server.use(bp.urlencoded({ extended: false }));
 server.use(bp.json());
 
-function parseIsUploaded(isUploaded)
-{
-    if (isUploaded === "False")
-        {
-            return false
-        }
-    if (isUploaded === "True")
-    {
-        return  true
-    }
-    return isUploaded
-}
-
-function getSuperFolderPath()
-{
-    const current_folder_string_length = path.basename(__dirname).length
-    const current_dir_string_length = __dirname.length
-
-    return __dirname.slice(0, current_dir_string_length - current_folder_string_length - 1)
-}
+set_uploads_dir()
 
 server.listen(4321, ()=>
     {
@@ -129,3 +109,38 @@ server.all("*", (req, res)=>
         res.status(404).send({success: false, message: "resource is not found"})
     }
 )
+
+function parseIsUploaded(isUploaded)
+{
+    if (isUploaded === "False")
+        {
+            return false
+        }
+    if (isUploaded === "True")
+    {
+        return  true
+    }
+    return isUploaded
+}
+
+function getSuperFolderPath()
+{
+    const current_folder_string_length = path.basename(__dirname).length
+    const current_dir_string_length = __dirname.length
+
+    return __dirname.slice(0, current_dir_string_length - current_folder_string_length - 1)
+}
+
+function set_uploads_dir()
+{
+    const supposedDirPath = path.join(__dirname, "public", "uploads")
+    fs.mkdir(supposedDirPath, {recursive:true}, (err)=>
+        {
+            console.log(err)
+        })
+    /*
+    fs.access(supposedDirPath, fs.constants.F_OK, (err) => {
+        console.log(supposedDirPath)
+        fs.mkdir(supposedDirPath)
+      });*/
+}

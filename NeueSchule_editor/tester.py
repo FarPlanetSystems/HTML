@@ -1,17 +1,18 @@
-"""from datetime import datetime
-import requests
-#files = {'file': ("article_image", open('D:/stuff/HTML/backend/public/arrow.png', 'rb'))}
-#files = {'image', open('D:/stuff/HTML/backend/public/arrow.png', 'rb')}
-files = {'file': ("image", open('D:/stuff/HTML/backend/public/arrow.png', 'rb'))}
-print(files)
 
-requests.post("http://localhost:4321/images", files = files)
+import os
+from PIL import Image
+old_image_path = "D:/stuff/HTML/neueSchule_editor/images/icon.jpg"
+new_image_path = "D:/stuff/HTML/backend/public/Blumen.jpg"
 
-"""
-import requests
+dest = os.path.dirname(old_image_path)
 
-url = "http://localhost:4321/stats"
-    
-files = {'uploaded_file': open('D:/stuff/HTML/backend/public/arrow.png', 'rb')}
-requests.post(url, files= files)
-print(files["uploaded_file"].name)
+image = Image.open(new_image_path)
+image = image.resize((500, 500))
+
+os.remove(old_image_path)
+
+image.save(os.path.join(dest, os.path.basename(new_image_path)))
+
+
+
+

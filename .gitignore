@@ -3,5 +3,6 @@
 /backend/tester.js
 /backend/tester.html
 /refs
-/backend/uploads
+/backend/public/uploads/
 /neueSchule_editor/tester.py
+/neueSchule_editor/images
