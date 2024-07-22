@@ -1,6 +1,5 @@
 const {Sequelize, Model, DataTypes, where} = require("sequelize");
 const {config} = require('./database_config');
-const { toInteger } = require("lodash");
 
 //connect to the db
 let model 
@@ -20,7 +19,7 @@ if(isConnected)
     // create table "article"
     model = GenerateModel()
     model.sync()
-    module.exports = {LoadAllArticles, FindLatestUploadedTitles, SaveArticle, DeleteArticle, UpdateArticle}
+    module.exports = {LoadAllArticles, FindLatestUploadedTitles, SaveArticle, DeleteArticle, UpdateArticle, addImage, LoadAllImageNames}
 }
 
 async function LoadAllArticles(UploadedOnly)
@@ -51,6 +50,17 @@ async function LoadAllArticles(UploadedOnly)
     return articles
 }
 
+async function LoadAllImageNames()
+{
+    imageNames = await model.findAll(
+        {attributes:["imageName"]}
+    )
+    for(let i = 0; i<imageNames.length; i++)
+        {
+            imageNames[i] = imageNames[i].imageName
+        }
+    return imageNames
+}
 
 async function FindLatestUploadedTitles(num)
 {
@@ -65,6 +75,7 @@ async function FindLatestUploadedTitles(num)
     //sorting selected articles from latest to earliest.(yeah, bubble sorting)
     for(let i = 0; i<articles.length; i++)
         {
+            
             for(let j = i + 1; j<articles.length; j++)
                 {
                     let article1 = articles[i]
@@ -123,7 +134,6 @@ function CreateArticleJson(id, title, text, date, isUploaded, articleTime, image
         "imageName": imageName,
         "imagePath": imagePath
     }
-    console.log(json.isUploaded)
     return json
 }
 
@@ -144,7 +154,6 @@ async function SaveArticle(ArticleJson)
         imageName: ArticleJson.imageName,
         imagePath: ArticleJson.imagePath
         })
-    console.log(newArticle instanceof model)
     return newArticle.id
 }
 async function DeleteArticle(ArticleId)
@@ -174,6 +183,20 @@ async function UpdateArticle(NewArticleJson, articleId)
                 id: articleId
             }
         }
+    )
+}
+async function addImage(articleId, imageName)
+{
+    await model.update(
+        {
+            imageName: imageName
+        },
+        {
+        where:
+        {
+            id: articleId
+        }
+    }
     )
 }
 

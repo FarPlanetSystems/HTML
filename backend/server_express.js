@@ -1,10 +1,27 @@
 const express = require("express")
-const {LoadAllArticles, FindLatestUploadedTitles, SaveArticle, DeleteArticle, UpdateArticle} = require("./db_accesser")
+const {LoadAllArticles, FindLatestUploadedTitles, SaveArticle, DeleteArticle, UpdateArticle, addImage} = require("./db_accesser")
+const multer = require("multer");
+const bp = require("body-parser");
+const path = require("path")
+
+var storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+      cb(null, "uploads"); // here we specify the destination . in this case i specified the current directory
+    },
+    filename: function(req, file, cb) {
+      console.log(file);
+      cb(null, file.originalname);// here we specify the file saving name . in this case i specified the original file name
+    }
+  });
+
+
+
+const upload = multer({storage:storage})
 
 const server = express()
 server.use(express.static("./public"))
-server.use(express.urlencoded({extended:false}))
-server.use(express.json())
+server.use(bp.urlencoded({ extended: false }));
+server.use(bp.json());
 
 function parseIsUploaded(isUploaded)
 {
@@ -19,6 +36,14 @@ function parseIsUploaded(isUploaded)
     return isUploaded
 }
 
+function getSuperFolderPath()
+{
+    const current_folder_string_length = path.basename(__dirname).length
+    const current_dir_string_length = __dirname.length
+
+    return __dirname.slice(0, current_dir_string_length - current_folder_string_length - 1)
+}
+
 server.listen(4321, ()=>
     {
         console.log("server is listening on port 4321")
@@ -26,22 +51,34 @@ server.listen(4321, ()=>
 )
 server.get("/", (req, res)=>
     {
-        res.sendFile("/stuff/HTML/index.html")
+        const index_absolute = path.resolve(getSuperFolderPath(), "index.html")
+        res.sendFile(index_absolute)
+        console.log(__dirname)
     }
 )
 server.get("/about", (req, res)=>
     {
-        res.sendFile("/stuff/HTML/aims_page.html")
+        const about_absolute = path.resolve(getSuperFolderPath(), "aims_page.html")
+        res.sendFile(about_absolute)
     }
 )
 server.get("/contact", (req, res)=>
     {
-        res.sendFile("/stuff/HTML/participation_page.html")
+        const contact_absolute = path.resolve(getSuperFolderPath(), "participation_page.html")
+        res.sendFile(contact_absolute)
     }
 )
-server.get("/api/lastArticle", (req, res)=>
+server.get("/api/lastArticles:id", (req, res)=>
     {
-        res.json({id:3, title:"hello", text:"vfwedrvtbynumi", date:"14.07.2024"})
+        const {id} = req.params
+        console.log(id)
+        FindLatestUploadedTitles(id)
+        .then(value => {
+            console.log(value)
+            res.status(200).send(value)
+        }
+        )
+        .catch(()=> res.status(404).send({success: false, message:"articles are not found"}))
     }
 )
 server.post("/api/articles", (req, res)=>
@@ -72,7 +109,6 @@ server.put("/api/articles:id", (req, res) =>
         const article = req.body
         article.isUploaded = parseIsUploaded(article.isUploaded)
         
-        console.log(article.isUploaded)
         UpdateArticle(article, id)
         res.json({success: true, message: article.title})
     })
@@ -80,9 +116,16 @@ server.get("/api/allUploadedArticles", (req, res)=>
     {
         LoadAllArticles(true).then(value => res.send(value))
     })
+server.post("/api/images:id", upload.single("article_image"), (req, res)=>
+    {
 
+        const {id} = req.params
+        addImage(id, req.file.filename)
+        
+        res.status(200).send("file disk upload success");
+    })
 server.all("*", (req, res)=>
     {
-        res.status(404).send("Page is not found")
+        res.status(404).send({success: false, message: "resource is not found"})
     }
 )

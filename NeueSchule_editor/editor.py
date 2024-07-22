@@ -163,6 +163,9 @@ class App:
         api_update_url = "http://localhost:4321/api/articles" + oldArticle.id.__str__()
         response = requests.put(api_update_url, newArticle.json()).json()
 
+        # sending the image of the uploaded article, if ones path was added
+        self.__sendImage(oldArticle.id, newArticle.image)
+
         if(newArticle.isUploaded):
             msg = self.__generateMessageText(response, " was not uploaded", " was uploaded")
             self.NotifyOnNewMessage(msg)
@@ -179,12 +182,24 @@ class App:
     
     def UpdateArticle(self, oldArticle:Article, newArticle:Article):
         api_update_url = "http://localhost:4321/api/articles" + oldArticle.id.__str__()
+        # sending the actual new article
         response = requests.put(api_update_url, newArticle.json()).json()
 
+        # sending the image of the updated article, if ones path was added
+        self.__sendImage(oldArticle.id, newArticle.image)
+
+        # Notification of the system
         msg = self.__generateMessageText(response, " was not saved", " was saved")
         self.NotifyOnNewMessage(msg)
 
-
+    def __sendImage(self, id, imagePath):
+        api_addImage_url = "http://localhost:4321/api/images" + id.__str__()
+        try:
+            print(imagePath)
+            image = {"article_image": open(imagePath, 'rb')}
+            requests.post(api_addImage_url, files=image)
+        except:
+            print("no image path added")
 
     def __generateMessageText(self, api_response, error_msg:str, success_msg:str):
         Text = ""
