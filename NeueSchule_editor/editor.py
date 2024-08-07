@@ -17,12 +17,15 @@ class Article:
         self.time = time
         self.isUploaded = isUploaded
         self.ArticleOpened_event = self.__default_articleOpened
+        self.NotifyUnsavedChanges = None
     
     def __default_articleOpened(self, obj):
         pass
 
     def OpenArticle(self):
-        self.ArticleOpened_event(self)
+        if self.NotifyUnsavedChanges != None:
+            if self.NotifyUnsavedChanges():
+                self.ArticleOpened_event(self)
     def __str__(self):
         return "article"
     def json(self):
@@ -49,6 +52,7 @@ class Library:
         self.NotifyCurrentArticleChanged = self.__default_CurrentArticleChanged
         self.NotifyArticleAdded = self.__default_CurrentArticleChanged
         self.NotifyArticleRemoved = self.__default_CurrentArticleChanged
+        self.AskUser_modifiedArticleData = None
         self.NotifyImageWasAttached = imageAttachedEvent
 
 
@@ -65,7 +69,7 @@ class Library:
         #generating strings of the current time
         datestr = str(date.today())
         timestr = str(datetime.now().hour) + ":" + str(datetime.now().minute) + ":" + str(datetime.now().second)
-        #creating the new instance of uodated article
+        #creating the new instance of updated article
         newArticle = Article(title, text, image, datestr, self.currentArticle.isUploaded, timestr)
         newArticle.id = self.currentArticle.id
         #updating the old instance in db
@@ -85,6 +89,7 @@ class Library:
         timestr = str(datetime.now().hour) + ":" + str(datetime.now().minute) + ":" + str(datetime.now().second)
         article = Article(title, text, imagePath, datestr, False, timestr)
         article.ArticleOpened_event = self.SetCurrentArticle
+        article.NotifyUnsavedChanges = self.AskUser_modifiedArticleData
         self.__saveEvent(article)
         self.addArticle(article)
 
@@ -118,7 +123,9 @@ class Library:
             self.currentArticle.isUploaded = newArticle.isUploaded
             self.SetCurrentArticle(self.currentArticle)
     
-    
+    def SetArticlesNotifier(self):
+        for article in self.__articles:
+            article.NotifyUnsavedChanges = self.AskUser_modifiedArticleData
 
     def getNumOfArticles(self):
         return len(self.__articles)
@@ -142,7 +149,9 @@ class App:
         self.MainWindow = MainWindow(self.Library, self)
         self.AllWindows.append(MainWindow)
         if self.Library.getNumOfArticles() > 0:
-            self.Library.getArticleByIndex(0).OpenArticle()
+            firstArticle = self.Library.getArticleByIndex(0)
+            self.Library.SetCurrentArticle(firstArticle)
+        self.Library.SetArticlesNotifier()
     
     def __setImagesFolder(self):
         supposedDirName = os.path.join(os.path.curdir, "neueSchule_editor", "images")
@@ -247,9 +256,12 @@ class App:
         #some articles may refer to one image with the same name, so we need to
         #check this option and change the basename of the path in that case
         i = 1
+        base = res[:len(res)-4]
+        ext = res[len(res)-4: len(res)]
         while os.path.exists(res):
             i += 1
-            res = res+str(i)
+            base = base[:len(base)-1]+str(i)
+            res = base + ext
         res = os.path.abspath(res)
         image.save(res)
         return res
@@ -264,6 +276,7 @@ class App:
             article = Article(i["title"], i["text"], i["imagePath"], i["date"], i["isUploaded"], i["articleTime"])
             article.id = i["id"]
             article.ArticleOpened_event = self.Library.SetCurrentArticle
+
             self.Library.addArticle(article)
         pass
 

@@ -1,9 +1,8 @@
 import tkinter as tk
 import abc
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, messagebox
 from datetime import date
 from PIL import Image, ImageTk
-
 class Window(abc.ABC):
     def __init__(self, dataContext):
         self._visualizer = tk.Tk()
@@ -35,10 +34,12 @@ class MainWindow(Window):
         self.isImageShown = False
         self.MessageLine = tk.StringVar()
         app.NotifyOnNewMessage =  self.MessageLine.set
+        self.__unmodifiedData = ArticleDataProvider()
+        self.dataContext.AskUser_modifiedArticleData = self.__ask_modified
 
         dataContext.NotifyCurrentArticleChanged = self.__onArticleOpened
 
-        self.__articleTextEntry = tk.Text(master=self._visualizer, font="Calibri 20")
+        self.ArticleTextEntry = tk.Text(master=self._visualizer, font="Calibri 20")
 
 
     def SetDefaultVisualization(self):
@@ -79,7 +80,7 @@ class MainWindow(Window):
         ImageAddingFrame.columnconfigure(2, weight=1)
         ImageAddingFrame.rowconfigure(1, weight=1)
 
-        self.ImagePathEntry = ttk.Label(master=ImageAddingFrame, font="Calibri 16", textvariable=self.ArticleImagePath)
+        self.ImagePathEntry = ttk.Label(master=ImageAddingFrame, font="Calibri 16", textvariable=self.ArticleImagePath, )
         self.ImagePathEntry.grid(row=0, column=0, sticky="nsew")
 
         ImportImageButton = ttk.Button(master=ImageAddingFrame, text="import image", command=self.__clickImportButton)
@@ -96,7 +97,7 @@ class MainWindow(Window):
         ArticleTitleEntry.grid(row=2, column=1, columnspan=2, sticky='nsew', padx=10, pady=10)
 
         # row 3 column 1
-        self.__articleTextEntry.grid(row=3, column=1, columnspan=2, sticky='nsew', padx=10, pady=10)
+        self.ArticleTextEntry.grid(row=3, column=1, columnspan=2, sticky='nsew', padx=10, pady=10)
         
         # row 4 column 1
         ButtonFrame = ttk.Frame(master=self._visualizer)
@@ -123,7 +124,8 @@ class MainWindow(Window):
 
     def __clickSaveButton(self):
 
-        self.dataContext.SaveArticleCommand(self.ArticleTitle.get(), self.__articleTextEntry.get(1.0, "end"), self.ArticleImagePath.get())
+        self.dataContext.SaveArticleCommand(self.ArticleTitle.get(), self.ArticleTextEntry.get(1.0, "end"), self.ArticleImagePath.get())
+        self.__unmodifiedData.update(self)
         ArticlesList(self._visualizer, self.dataContext, self.__createEmptyArticle)
     
     def __clickDeleteButton(self):
@@ -131,7 +133,9 @@ class MainWindow(Window):
         ArticlesList(self._visualizer, self.dataContext, self.__createEmptyArticle)
 
     def __clickUploadButton(self):
-        self.dataContext.uploadArticleCommand(self.ArticleTitle.get(), self.__articleTextEntry.get(1.0, "end"), self.ArticleImagePath.get())
+        self.dataContext.uploadArticleCommand(self.ArticleTitle.get(), self.ArticleTextEntry.get(1.0, "end"), self.ArticleImagePath.get())
+        self.__unmodifiedData.update(self)
+
         ArticlesList(self._visualizer, self.dataContext, self.__createEmptyArticle)
 
     def __clickCheckImageButton(self):
@@ -167,18 +171,29 @@ class MainWindow(Window):
             self.__clickCheckImageButton()
             self.__clickCheckImageButton()
 
+    def __ask_modified(self):
+        if not self.__unmodifiedData.check(self):
+            if messagebox.askokcancel("modified article", "closing the current article, all your unsaved changes will be lost. Continue?"):
+                return True
+            else:
+                return False
+        return True
+
+
+
     def __onArticleOpened(self):
-        self.__articleTextEntry.delete(1.0, "end")
-        self.__articleTextEntry.insert(1.0, self.dataContext.currentArticle.text)
+        self.ArticleTextEntry.delete(1.0, "end")
+        self.ArticleTextEntry.insert(1.0, self.dataContext.currentArticle.text)
         self.ArticleTitle.set(self.dataContext.currentArticle.title)
         self.ArtcleDate.set(self.dataContext.currentArticle.date)
         self.IsArticleUploaded.set(self.dataContext.currentArticle.isUploaded)
         self.ArticleImagePath.set(self.dataContext.currentArticle.image)
         self.path = self.dataContext.currentArticle.image
+        self.__unmodifiedData.update(self)
 
     def __clear(self):
         self.ArticleTitle.set("draft")
-        self.__articleTextEntry.delete(1.0, "end")
+        self.ArticleTextEntry.delete(1.0, "end")
         self.ArtcleDate.set(str(date.today()))
         self.IsArticleUploaded.set(False)
         self.ArticleImagePath.set("no image")
@@ -186,7 +201,8 @@ class MainWindow(Window):
 
     def __createEmptyArticle(self):
         self.__clear()
-        self.dataContext.createArticle(self.ArticleTitle.get(), self.__articleTextEntry.get(1.0, "end"), self.ArticleImagePath.get())
+        self.dataContext.createArticle(self.ArticleTitle.get(), self.ArticleTextEntry.get(1.0, "end"), self.ArticleImagePath.get())
+        self.__unmodifiedData.update(self)
         ArticlesList(self._visualizer, self.dataContext, self.__createEmptyArticle)
         pass
 
@@ -247,3 +263,30 @@ class ArticlesList(ttk.Frame):
     def __createAddArticleButton(self, command):
         self.add_button = ttk.Button(self.__articlesFrame, command=command, text="+")
         self.add_button.pack(expand=True, fill='both', padx=20, pady=20)
+    
+class ArticleDataProvider:
+    def __init__(self):
+        self.ArticleTitle = ""
+        self.ArticleDate = ""
+        self.IsArticleUploaded = False
+        self.ArticleImagePath = ""
+        self.ArticleText = ""
+    def update(self, window:MainWindow):
+        self.ArticleDate = window.ArtcleDate.get()
+        self.ArticleImagePath = window.ArticleImagePath.get()
+        self.ArticleTitle = window.ArticleTitle.get()
+        self.ArticleText = window.ArticleTextEntry.get(1.0, "end")
+        self.IsArticleUploaded = window.IsArticleUploaded.get()
+    def check(self, window:MainWindow):
+        if self.ArticleDate != window.ArtcleDate.get():
+            return False
+        elif self.ArticleTitle != window.ArticleTitle.get():
+            return False
+        elif self.ArticleText != window.ArticleTextEntry.get(1.0, "end"):
+            return False
+        elif self.ArticleImagePath != window.ArticleImagePath.get():
+            return False
+        elif self.IsArticleUploaded != window.IsArticleUploaded.get():
+            return False
+        else:
+            return True

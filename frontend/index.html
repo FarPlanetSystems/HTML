@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neue Schule</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="icon" type="image.jpg" href="/icon.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!--navigational bar-->
+    <nav class="navbar">
+      <div class="container">
+        <div class="logo">
+          <a href="/" class="logoref">
+            <img src="/logo-transperent.png" class="logoImage" />
+          </a>
+          <div class="logoText">
+            <h2
+              style="font-family: Merriweather; font-size: 20px; color: black"
+            >
+              NEUE SCHULE 2024
+            </h2>
+          </div>
+        </div>
+
+        <div class="pagesContainer">
+          <ul class="pages">
+            <li>
+              <a href="/about" class="pageref"> Was wir sind </a>
+            </li>
+            <li>
+              <a href="/contact" class="pageref"> Mitmachen </a>
+            </li>
+            <li>
+              <a href="/" class="pageref"> Manifest </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!--hero-->
+    <section class="hero">
+      <div class="container-small">
+        <div class="description">
+          <h1 class="hero-heading">
+            Gesellschaft der Verantwotungsbewussten Schueler*innen Deutschlands
+          </h1>
+          <p class="hero-subdesc">
+            Sie befinden sich aud der Site
+            <i
+              >der Gesellschaft der Verantwotungsbewussten Schueler*innen
+              Deutschlands.</i
+            >
+
+            Hier koennen Sie alle Informationen ueber unsere Taetigkeit
+            erhalten, sowie uns kontaktieren.
+          </p>
+        </div>
+      </div>
+    </section>
+    <!--Articles-->
+    <section class="news-section">
+      <div class="container">
+        <div class="news-section-header">
+          <h2>Aktuelles</h2>
+        </div>
+        <div class="articles" id="articles-div1">
+          <ul id="NewsList"></ul>
+        </div>
+        <div class="open">
+          <a class="open-all-articles"> alle anschauen </a>
+        </div>
+      </div>
+    </section>
+    <!--footer-->
+    <footer>
+      <div class="container">
+        <div class="footer-logo">
+          <img src="/logo-transperent-light.png" />
+          <p>Neue Schule 2024</p>
+        </div>
+        <div class="footer-refs">
+          <div class="footer-ref">
+            <p>unsere email:</p>
+            <a href="mailto:someone@gmail.com">someone@gmail.com</a>
+          </div>
+          <div class="footer-ref">
+            <p>the source code of this site:</p>
+            <a href="https://github.com/FarPlanetSystems/NeueSchule">
+              NeueSchule
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!--script-->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js"
+      integrity="sha512-JSCFHhKDilTRRXe9ak/FJ28dcpOJxzQaCd3Xg8MyF6XFjODhy/YMCM8HW0TFDckNHWUewW+kfvhin43hKtJxAw=="
+      crossorigin="anonymous"
+    ></script>
+    <script src="index.js"></script>
+  </body>
+</html>
