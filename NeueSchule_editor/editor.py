@@ -5,7 +5,6 @@ from editor_view import MainWindow
 from PIL import Image
 import os
 
-
 #ViewModel
 class Article:
     def __init__(self, title, text, image, date, isUploaded:bool, time):

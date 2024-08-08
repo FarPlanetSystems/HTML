@@ -1,9 +1,9 @@
 /node_modules
 /backend/database_config.js
 /backend/tester.js
-/backend/tester.html
+/frontend/tester.html
 /refs
 /backend/public/uploads/
 /neueSchule_editor/tester.py
 /neueSchule_editor/images
-/backend/public/scrap.html
+/frontend/scrap.html

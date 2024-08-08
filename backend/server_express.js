@@ -11,6 +11,7 @@ const multer = require("multer");
 const bp = require("body-parser");
 const path = require("path");
 const fs = require("node:fs");
+const { readFile } = require("fs");
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -34,6 +35,7 @@ set_uploads_dir();
 server.listen(4321, () => {
   console.log("server is listening on port 4321");
 });
+//index page
 server.get("/", (req, res) => {
   const index_absolute = path.resolve(
     getSuperFolderPath(),
@@ -42,6 +44,7 @@ server.get("/", (req, res) => {
   );
   res.sendFile(index_absolute);
 });
+//about page
 server.get("/about", (req, res) => {
   const about_absolute = path.resolve(
     getSuperFolderPath(),
@@ -50,6 +53,7 @@ server.get("/about", (req, res) => {
   );
   res.sendFile(about_absolute);
 });
+//contact page
 server.get("/contact", (req, res) => {
   const contact_absolute = path.resolve(
     getSuperFolderPath(),
@@ -58,6 +62,37 @@ server.get("/contact", (req, res) => {
   );
   res.sendFile(contact_absolute);
 });
+//manifest page
+server.get("/manifest", (req, res) => {
+  const manifest_absolute = path.resolve(
+    getSuperFolderPath(),
+    "frontend",
+    "manifest.html"
+  );
+  res.sendFile(manifest_absolute);
+});
+//the text of the manifest
+server.get("/api/manifest_text", (req, res) => {
+  text = readFile(
+    path.resolve(
+      getSuperFolderPath(),
+      "backend",
+      "public",
+      "manifest_text.txt"
+    ),
+    "utf-8",
+    (err, result) => {
+      if (err) {
+        res.send("");
+        console.log(err);
+      } else {
+        console.log(result);
+        res.send(result);
+      }
+    }
+  );
+});
+//sending last id published articles
 server.get("/api/lastArticles:id", (req, res) => {
   const { id } = req.params;
   console.log(id);
@@ -72,6 +107,7 @@ server.get("/api/lastArticles:id", (req, res) => {
         .send({ success: false, message: "articles are not found" })
     );
 });
+//saving an article(from python editor)
 server.post("/api/articles", (req, res) => {
   const article = req.body;
   article.isUploaded = parseIsUploaded(article.isUploaded);
@@ -80,16 +116,19 @@ server.post("/api/articles", (req, res) => {
   );
 });
 //must be encrypted, I suppose(since we don't want to be able to get all articles in browser as a user, but we want to see them in the editor)
+//sending all articles
 server.get("/api/articles", (req, res) => {
   LoadAllArticles(false).then((value) => {
     res.send(value);
   });
 });
+//delete an article by id
 server.delete("/api/articles:id", (req, res) => {
   const { id } = req.params;
   DeleteArticle(id);
   res.json({ success: true, message: "" });
 });
+//change article by id
 server.put("/api/articles:id", (req, res) => {
   const { id } = req.params;
   const article = req.body;
@@ -98,9 +137,11 @@ server.put("/api/articles:id", (req, res) => {
   UpdateArticle(article, id);
   res.json({ success: true, message: article.title });
 });
+// all published articles
 server.get("/api/allUploadedArticles", (req, res) => {
   LoadAllArticles(true).then((value) => res.send(value));
 });
+// upload the image of a published article
 server.post("/api/images:id", upload.single("article_image"), (req, res) => {
   const { id } = req.params;
   addImage(id, req.file.filename);
@@ -110,6 +151,8 @@ server.post("/api/images:id", upload.single("article_image"), (req, res) => {
 server.all("*", (req, res) => {
   res.status(404).send({ success: false, message: "resource is not found" });
 });
+
+//fucntions
 
 function parseIsUploaded(isUploaded) {
   if (isUploaded === "False") {

@@ -69,7 +69,7 @@ image {
 }
 .description {
   color: black;
-  background-image: url("/smooth-gray-background.png");
+  background-image: url("/images/smooth-gray-background.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: left;
@@ -88,7 +88,7 @@ image {
 }
 
 .hero {
-  background-image: url("/the_free_sciences.png");
+  background-image: url("/images/the_free_sciences.png");
   background-size: contain;
   background-position: center bottom;
   height: 675px;
