@@ -36,7 +36,7 @@
               <a href="/about" class="pageref"> Was wir sind </a>
             </li>
             <li>
-              <a href="#" onclick="showMembershipForm()" class="pageref">
+              <a href="#" class="pageref" onclick="showMembershipForm()">
                 Mitmachen
               </a>
             </li>
@@ -49,21 +49,64 @@
     </nav>
     <!--hero-->
     <section class="hero">
-      <div class="container-small" id="hero-container-small">
-        <div class="description" id="hero-desc">
-          <h1 class="hero-heading">
-            Gesellschaft der Verantwotungsbewussten Schueler*innen Deutschlands
-          </h1>
-          <p class="hero-subdesc">
-            Sie befinden sich aud der Site
-            <i
-              >der Gesellschaft der Verantwotungsbewussten Schueler*innen
-              Deutschlands.</i
-            >
-
-            Hier koennen Sie alle Informationen ueber unsere Taetigkeit
-            erhalten, sowie uns kontaktieren.
-          </p>
+      <div class="container-small">
+        <div class="sign-up">
+          <h3 class="form-heading">Eraehl uns ueber dich!</h3>
+          <form
+            action="participationPage.html"
+            method="POST"
+            class="sign-up-form"
+          >
+            <div class="name-group">
+              <input
+                type="text"
+                id="prename"
+                class="name-input"
+                placeholder="Vorname"
+                minlength="3"
+                maxlength="20"
+              />
+              <input
+                id="familyName"
+                type="text"
+                class="name-input"
+                placeholder="Nachname"
+                minlength="3"
+              />
+            </div>
+            <textarea
+              class="member-desc"
+              placeholder="schreib, was du bei uns leisten koenntest/moechtest"
+            ></textarea>
+            <div class="schooling-group">
+              <h4 class="form-heading">Wie ist deine Schullform?</h4>
+              <div class="schooling-subgroup">
+                <input
+                  id="quantity"
+                  type="number"
+                  placeholder="Stufe"
+                  max="13"
+                  min="7"
+                  class="class-level"
+                />
+                <select class="schoolform-selector">
+                  <option>Gymnasium</option>
+                  <option>Realschule</option>
+                  <option>Hauptschule</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-buttons">
+              <input
+                class="submit-button"
+                type="submit"
+                onclick="closeMembershipForm()"
+              />
+              <button class="submit-button" onclick="closeMembershipForm()">
+                schliessen
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </section>

@@ -6,6 +6,7 @@ const {
   DeleteArticle,
   UpdateArticle,
   addImage,
+  SaveMember,
 } = require("./db_accesser");
 const multer = require("multer");
 const bp = require("body-parser");
@@ -29,6 +30,7 @@ const server = express();
 server.use(express.static("./public"));
 server.use(bp.urlencoded({ extended: false }));
 server.use(bp.json());
+server.use(express.urlencoded({ extended: false }));
 
 set_uploads_dir();
 
@@ -62,6 +64,20 @@ server.get("/contact", (req, res) => {
   );
   res.sendFile(contact_absolute);
 });
+//submiting the membership form
+server.post("/submit_membership", (req, res) => {
+  const response = req.body;
+  SaveMember(response);
+  res
+    .status(200)
+    .sendFile(
+      path.resolve(
+        getSuperFolderPath(),
+        "frontend",
+        "confirmed_membership.html"
+      )
+    );
+});
 //manifest page
 server.get("/manifest", (req, res) => {
   const manifest_absolute = path.resolve(
@@ -84,9 +100,7 @@ server.get("/api/manifest_text", (req, res) => {
     (err, result) => {
       if (err) {
         res.send("");
-        console.log(err);
       } else {
-        console.log(result);
         res.send(result);
       }
     }

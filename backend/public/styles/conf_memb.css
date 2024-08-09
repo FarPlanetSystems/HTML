@@ -1,0 +1,98 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0px;
+}
+:root {
+  --primary-color--: #f0f0f0;
+  --dark-color--: #0057ca;
+  --light-color--: #d3f2ff;
+  --form-gray--: #868686;
+}
+body {
+  font-family: "Merriweather", "Noto Sans";
+  font-size: 16px;
+  line-height: 1.5;
+  background-color: var(--light-color--);
+}
+.logoImage {
+  height: 100px;
+}
+/*
+  navbar
+  */
+.navbar {
+  line-height: 1;
+  background-color: var(--light-color--);
+  padding: 0px;
+}
+.navbar .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.container {
+  max-width: 1500px;
+  margin: 0 0;
+  padding: 0 0;
+}
+.container-small {
+  max-width: 875px;
+  margin: 0 auto;
+  padding: 0 0;
+}
+a {
+  text-decoration: none;
+  color: black;
+}
+ul {
+  list-style: none;
+}
+image {
+  max-width: 100%;
+}
+.logo {
+  display: flex;
+  align-items: center;
+}
+.logoText {
+  max-width: 150px;
+  text-align: left;
+}
+.pages {
+  display: flex;
+}
+.navbar ul li a {
+  padding: 20px;
+  display: block;
+  font-weight: 600;
+  transition: 0.5s;
+}
+.navbar ul li a:hover {
+  color: var(--dark-color--);
+}
+.hero {
+  background-image: url("/images/the_free_sciences.png");
+  background-size: contain;
+  background-position: center bottom;
+  height: 675px;
+  padding-top: 40px;
+}
+.description {
+  color: black;
+  background-color: var(--primary-color--);
+  border-radius: 15px;
+  padding: 30px;
+}
+.hero-heading {
+  font-size: 3rem;
+  font-weight: 600;
+  padding-bottom: 300px;
+}
+.description a {
+  padding-top: 300px;
+  transition: 0.5s;
+}
+.description a:hover {
+  color: var(--dark-color--);
+}

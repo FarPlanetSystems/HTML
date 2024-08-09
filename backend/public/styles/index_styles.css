@@ -5,8 +5,9 @@
 }
 :root {
   --primary-color--: #f0f0f0;
-  --dark-color--: #004aad;
+  --dark-color--: #0057ca;
   --light-color--: #d3f2ff;
+  --form-gray--: #868686;
 }
 body {
   font-family: "Merriweather", "Noto Sans";
@@ -17,6 +18,9 @@ body {
 .logoImage {
   height: 100px;
 }
+/*
+navbar
+*/
 .navbar {
   line-height: 1;
   background-color: var(--light-color--);
@@ -67,6 +71,9 @@ image {
 .navbar ul li a:hover {
   color: var(--dark-color--);
 }
+/*
+Hero
+*/
 .description {
   color: black;
   background-image: url("/images/smooth-gray-background.png");
@@ -93,6 +100,9 @@ image {
   background-position: center bottom;
   height: 675px;
 }
+/*
+News
+*/
 .news-section {
   background-color: var(--light-color--);
 }
@@ -161,7 +171,9 @@ image {
 .open :hover {
   padding: 25px;
 }
-
+/*
+footer
+*/
 footer {
   background-color: rgb(88, 88, 88);
   padding: 20px 0;
@@ -193,4 +205,96 @@ footer {
 .footer-ref a {
   color: #c9c9c9;
   margin-left: 10px;
+}
+/*
+sign-up window
+*/
+.sign-up {
+  background-color: var(--dark-color--);
+  border-radius: 20px;
+  justify-content: center;
+  justify-items: center;
+  margin: 0px 150px;
+  height: 600px;
+  font-size: 1.5rem;
+  box-shadow: 0px 0px 15px 2px rgb(0, 0, 0, 0.75);
+  transition: 0.5s;
+}
+.form-heading {
+  padding: 10px;
+  text-align: center;
+  color: var(--light-color--);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+.name-group {
+  display: flex;
+  flex-direction: column;
+}
+.nameLabel {
+  padding: 0px 50px;
+  color: var(--primary-color--);
+}
+.name-input {
+  padding: 5px;
+  margin: 15px;
+  height: 3rem;
+  font-size: 1.5rem;
+  background-color: var(--primary-color--);
+  border-radius: 10px;
+  border: none;
+  outline: none;
+}
+.member-desc {
+  padding: 5px;
+  margin: 15px;
+  height: 3rem;
+  font-size: 1.5rem;
+  border-radius: 10px;
+  resize: none;
+  border: none;
+  outline: none;
+  height: 125px;
+  width: 80%;
+  max-width: 450px;
+}
+.class-level {
+  height: 3rem;
+  font-size: 25px;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 15px;
+  border: none;
+  outline: none;
+}
+.schooling-subgroup {
+  display: flex;
+  justify-content: space-between;
+}
+.schoolform-selector {
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  font-size: 1.5rem;
+  padding: 5px;
+  margin: 15px;
+}
+.submit-button {
+  padding: 10px;
+  margin: 15px;
+  border: none;
+  outline: none;
+  font-size: 1.75rem;
+  border-radius: 10px;
+  background-color: var(--light-color--);
+  transition: 0.5s;
+}
+.sign-up-form .submit-button:hover {
+  padding: 12px;
+  background-color: var(--primary-color--);
+}
+.form-buttons {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
 }
