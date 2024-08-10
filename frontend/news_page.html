@@ -3,8 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Neue Schule</title>
-    <link rel="stylesheet" href="styles/index_styles.css" />
+    <link rel="stylesheet" href="/styles/news_styles.css" />
     <link rel="icon" type="image.jpg" href="/images/icon.jpg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,72 +11,31 @@
       href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
       rel="stylesheet"
     />
+    <title>Aktuelles</title>
   </head>
   <body>
-    <!--navigational bar-->
+    <!--navbar-->
     <nav class="navbar">
       <div class="container">
         <div class="logo">
           <a href="/" class="logoref">
             <img src="/images/logo-transperent.png" class="logoImage" />
           </a>
-          <div class="logoText">
-            <h2
-              style="font-family: Merriweather; font-size: 20px; color: black"
-            >
-              NEUE SCHULE 2024
-            </h2>
-          </div>
         </div>
-
+        <div class="nav-header">
+          <h1 class="headerTitle">Aktuelles</h1>
+        </div>
         <div class="pagesContainer">
-          <ul class="pages">
-            <li>
-              <a href="/about" class="pageref"> Was wir sind </a>
-            </li>
-            <li>
-              <a href="#" onclick="showMembershipForm()" class="pageref">
-                Mitmachen
-              </a>
-            </li>
-            <li>
-              <a href="/manifest" class="pageref"> Manifest </a>
-            </li>
-          </ul>
+          <a href="/" class="home-ref"> Home </a>
         </div>
       </div>
     </nav>
-    <!--hero-->
-    <section class="hero">
-      <div class="container-small" id="hero-container-small">
-        <div class="description" id="hero-desc">
-          <h1 class="hero-heading">
-            Gesellschaft der Verantwotungsbewussten Schueler*innen Deutschlands
-          </h1>
-          <p class="hero-subdesc">
-            Sie befinden sich aud der Site
-            <i
-              >der Gesellschaft der Verantwotungsbewussten Schueler*innen
-              Deutschlands.</i
-            >
-
-            Hier koennen Sie alle Informationen ueber unsere Taetigkeit
-            erhalten, sowie uns kontaktieren.
-          </p>
-        </div>
-      </div>
-    </section>
-    <!--Articles-->
-    <section class="news-section">
-      <div class="container">
-        <div class="news-section-header">
-          <h2>Aktuelles</h2>
-        </div>
-        <div class="articles" id="articles-div1">
-          <ul id="NewsList"></ul>
-        </div>
-        <div class="open">
-          <a class="open-all-articles" href="/news_page"> alle anschauen </a>
+    <!--articles section-->
+    <section class="news" id="news">
+      <div class="container-small" id="news-container-small">
+        <h2 class="articles-sec-header">Im Kontakt mit uns:</h2>
+        <div class="articles">
+          <ul class="articles-list" id="articles-list"></ul>
         </div>
       </div>
     </section>
@@ -108,6 +66,6 @@
       integrity="sha512-JSCFHhKDilTRRXe9ak/FJ28dcpOJxzQaCd3Xg8MyF6XFjODhy/YMCM8HW0TFDckNHWUewW+kfvhin43hKtJxAw=="
       crossorigin="anonymous"
     ></script>
-    <script src="scripts/index.js"></script>
+    <script src="/scripts/news.js"></script>
   </body>
 </html>

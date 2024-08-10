@@ -64,6 +64,15 @@ server.get("/contact", (req, res) => {
   );
   res.sendFile(contact_absolute);
 });
+//news page
+server.get("/news_page", (req, res) => {
+  const news_absolute = path.resolve(
+    getSuperFolderPath(),
+    "frontend",
+    "news_page.html"
+  );
+  res.sendFile(news_absolute);
+});
 //submiting the membership form
 server.post("/submit_membership", (req, res) => {
   const response = req.body;
@@ -136,6 +145,8 @@ server.get("/api/articles", (req, res) => {
     res.send(value);
   });
 });
+//send article by id
+server.get("/api/articles/:id", (req, res) => {});
 //delete an article by id
 server.delete("/api/articles:id", (req, res) => {
   const { id } = req.params;

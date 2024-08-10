@@ -27,7 +27,6 @@ function AddNewListItem(title, text, imageName) {
 
   // creating the DOM reference to the article page
   const Article_ref = document.createElement("a");
-  Article_ref.href = "/";
   NewsItem.append(Article_ref);
 
   const article_box_div = document.createElement("div");
